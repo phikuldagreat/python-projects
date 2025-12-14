@@ -420,6 +420,8 @@ class StudentDashboard(QMainWindow): #STUDENT'S DASHBOARD
             #ADD STUDENT INFO
             complaint_data['school_id'] = self.current_user['school_id']
             complaint_data['program'] = self.current_user['program']
+
+            print(f"Submitting complaint: {complaint_data}")
             
             #SUBMIT TO DATABASE
             success, message, complaint_id = self.db.submit_complaint(complaint_data)

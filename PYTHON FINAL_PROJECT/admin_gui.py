@@ -257,6 +257,7 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
         if db.connect():
             complaints_data = db.get_all_complaints()
             print(f"Got {len(complaints_data)} complaints")
+            print(f"Raw complaints from DB: {complaints_data}")
             db.close()
             
             complaints = []
@@ -274,25 +275,26 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
             self.all_complaints = complaints
             self.display_complaints(complaints)
         else:
+            print("Failed to connect to database!")
             self.all_complaints = []
             self.display_complaints([])
             
     def display_complaints(self, complaints): #DISPLAY COMPLAINTS IN THE TABLE
         self.complaints_table.setRowCount(len(complaints))
-            
+        
         for row, complaint in enumerate(complaints):
             for col, data in enumerate(complaint):
                 item = QTableWidgetItem(str(data))
-                    
+                
                 #STATUS COLOR CODES
-            if col == 4:  # STATUS COLUMN
-                if data == "Pending":
-                    item.setForeground(QColor(ColorTheme.STATUS_PENDING))
-                elif data == "In Progress":
-                    item.setForeground(QColor(ColorTheme.STATUS_IN_PROGRESS))
-                elif data == "Resolved":
-                    item.setForeground(QColor(ColorTheme.STATUS_RESOLVED))
-                    
+                if col == 4:  # STATUS COLUMN
+                    if data == "Pending":
+                        item.setForeground(QColor(ColorTheme.STATUS_PENDING))
+                    elif data == "In Progress":
+                        item.setForeground(QColor(ColorTheme.STATUS_IN_PROGRESS))
+                    elif data == "Resolved":
+                        item.setForeground(QColor(ColorTheme.STATUS_RESOLVED))
+                
                 self.complaints_table.setItem(row, col, item)
         
     def filter_complaints(self): #FILTER COMPLAINTS BASED ON SELECTED FILTERS
@@ -416,7 +418,7 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
         search_layout.addWidget(search_label)
         
         student_id_input = QLineEdit()
-        student_id_input.setPlaceholderText("e.g., 2021-12345")
+        student_id_input.setPlaceholderText("e.g., 560055")
         student_id_input.setMinimumHeight(35)
         student_id_input.setFont(QFont("Arial", 11))
         student_id_input.setStyleSheet(StyleSheet.get_input_style())
@@ -450,7 +452,7 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
         history_table.setStyleSheet(StyleSheet.get_table_style())
         layout.addWidget(history_table)
 
-        #SEARCH FUNCTION
+        #SEARCH FUNCTION (nested inside show_login_history_dialog)
         def search_history():
             student_id = student_id_input.text().strip()
             if not student_id:
@@ -491,6 +493,7 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
             else:
                 QMessageBox.critical(dialog, "Database Error", "Could not connect to database.")
         
+        # Connect the search button to the nested function
         search_btn.clicked.connect(search_history)
         student_id_input.returnPressed.connect(search_history)
         

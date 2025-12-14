@@ -16,7 +16,7 @@ def initialize_database():
     print("\nEnter your MySQL credentials:")
     host = input("Host (default: localhost): ").strip() or "localhost"
     user = input("Username (default: root): ").strip() or "root"
-    password = input("Password: ").strip()
+    password = input("Password: (default: none) ").strip()
     database = input("Database name (default: speak_db): ").strip() or "speak_db"
     
     #CREATE DATABASE INSTANCE

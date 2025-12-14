@@ -173,7 +173,7 @@ class Database:
         RETURNS:
             tuple OR None: (success: bool, message: str) IF DUPLICATE FOUND, ELSE NONE
         """
-        # Check for duplicate school ID
+        #CHECK FOR DUPLICATE SCHOOL ID
         self.cursor.execute(
             "SELECT id FROM students WHERE school_id = %s",
             (student_data['school_id'],)
@@ -181,7 +181,7 @@ class Database:
         if self.cursor.fetchone():
             return False, "School ID already registered.", None
         
-        # Check for duplicate email
+        #CHECK FOR DUPLICATE EMAIL
         self.cursor.execute(
             "SELECT id FROM students WHERE email = %s",
             (student_data['email'],)
@@ -489,32 +489,38 @@ class Database:
 
     def reset_student_password(self, school_id, email, new_password): #RESET PASSWORD FOR STUDENT ACCOUNT
         try:
+            self._ensure_connection()
+            
             #VERIFY SCHOOL ID AND EMAIL MATCH
-            query = """
-                SELECT StudentID FROM students 
-                WHERE SchoolID = %s AND Email = %s
-            """
+            query = '''
+                SELECT id FROM students 
+                WHERE school_id = %s AND email = %s
+            '''
             self.cursor.execute(query, (school_id, email))
             result = self.cursor.fetchone()
             
             if not result:
                 return False, "School ID and email do not match our records."
             
-            student_id = result[0]
+            student_id = result['id']
+            
+            #HASH THE NEW PASSWORD
+            new_password_hash = self.hash_password(new_password)
             
             #UPDATE PASSWORD
-            update_query = """
+            update_query = '''
                 UPDATE students 
-                SET Password = %s 
-                WHERE StudentID = %s
-            """
-            self.cursor.execute(update_query, (new_password, student_id))
-            self.conn.commit()
+                SET password_hash = %s 
+                WHERE id = %s
+            '''
+            self.cursor.execute(update_query, (new_password_hash, student_id))
+            self.connection.commit()
             
             return True, "Password reset successful! You can now login with your new password."
             
-        except Exception as e:
-            self.conn.rollback()
+        except Error as e:
+            print(f"Error resetting password: {e}")
+            self.connection.rollback()
             return False, f"Error resetting password: {str(e)}"
 
     def _ensure_connection(self): #CHECK DATABASE CONNECTION
@@ -529,3 +535,31 @@ class Database:
         except Error as e:
             print(f"Connection check failed: {e}")
             return self.connect()
+        
+    def get_login_history(self, student_id, limit=50): #GET LOGIN HISTORY FOR A STUDENT
+        try:
+            self._ensure_connection()
+            
+            query = '''
+                SELECT login_time, ip_address
+                FROM login_history
+                WHERE student_id = %s
+                ORDER BY login_time DESC
+                LIMIT %s
+            '''
+            self.cursor.execute(query, (student_id, limit))
+            results = self.cursor.fetchall()
+            
+            formatted_results = []
+            for row in results:
+                formatted_results.append({
+                    'login_time': row['login_time'].strftime('%Y-%m-%d %H:%M:%S') if row['login_time'] else 'N/A',
+                    'ip_address': row['ip_address']
+                })
+            
+            return formatted_results
+        except Error as e:
+            print(f"Error fetching login history: {e}")
+            import traceback
+            traceback.print_exc()
+            return []
