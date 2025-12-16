@@ -7,10 +7,63 @@ from PyQt6.QtWidgets import (
     QMainWindow, QLabel, QLineEdit, QPushButton, QVBoxLayout, 
     QHBoxLayout, QWidget, QMessageBox, QComboBox, QScrollArea, QDialog
 )
-from PyQt6.QtCore import Qt, pyqtSignal
-from PyQt6.QtGui import QFont
+from PyQt6.QtCore import Qt, pyqtSignal, QSize
+from PyQt6.QtGui import QFont, QIcon
 from theme import ColorTheme, StyleSheet
 
+
+#CUSTOM PASSWORD INPUT WITH TOGGLE INSIDE
+class PasswordInput(QLineEdit):
+    def __init__(self, placeholder_text="", parent=None):
+        super().__init__(parent)
+        self.setPlaceholderText(placeholder_text)
+        self.setEchoMode(QLineEdit.EchoMode.Password)
+        self.password_visible = False
+        
+        #CREATE TOGGLE BUTTON
+        self.toggle_btn = QPushButton("Show", self)
+        self.toggle_btn.setFlat(True)
+        self.toggle_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.toggle_btn.setFixedSize(30, 30)
+        self.toggle_btn.setStyleSheet("""
+            QPushButton {
+                background: transparent;
+                border: none;
+                font-size: 9px;
+                color: #666;
+                padding: 0px 4px;
+            }
+            QPushButton:hover {
+                color: #000;
+            }
+        """)
+        self.toggle_btn.clicked.connect(self.toggle_password_visibility)
+        
+        self._update_button_position()
+    
+    def toggle_password_visibility(self): #TOGGLE PASSWORD VISIBILITY
+        if self.password_visible:
+            self.setEchoMode(QLineEdit.EchoMode.Password)
+            self.toggle_btn.setText("Show")
+            self.password_visible = False
+        else:
+            self.setEchoMode(QLineEdit.EchoMode.Normal)
+            self.toggle_btn.setText("Hide")
+            self.password_visible = True
+    
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self._update_button_position()
+    
+    def _update_button_position(self):
+        button_size = self.toggle_btn.size()
+        frame_width = self.style().pixelMetric(self.style().PixelMetric.PM_DefaultFrameWidth)
+        self.toggle_btn.move(
+            self.rect().right() - button_size.width() - frame_width - 5,
+            (self.rect().bottom() - button_size.height()) // 2
+        )
+
+        self.setTextMargins(0, 0, button_size.width() + 10, 0)
 
 class RegisterWindow(QMainWindow): #REGISTRATION WINDOW
     
@@ -105,7 +158,7 @@ class RegisterWindow(QMainWindow): #REGISTRATION WINDOW
 
     def _add_email_field(self, layout): #EMAIL INPUT FIELD
         layout.addWidget(QLabel("School Email: <span style='color: red;'>*</span>"))
-        self.email_input = QLineEdit()  # CREATE FIRST
+        self.email_input = QLineEdit()
         self.email_input.setPlaceholderText("name.schoolid@umindanao.edu.ph")
         self.email_input.setMinimumHeight(35)
         self.email_input.setStyleSheet(StyleSheet.get_input_style())
@@ -159,17 +212,13 @@ class RegisterWindow(QMainWindow): #REGISTRATION WINDOW
 
     def _add_password_fields(self, layout): #PASSWORD AND CONFIRM PASSWORD INPUT FIELDS
         layout.addWidget(QLabel("Password: <span style='color: red;'>*</span>"))
-        self.password_input = QLineEdit()
-        self.password_input.setPlaceholderText("Create a password")
-        self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
+        self.password_input = PasswordInput("Create a password")
         self.password_input.setMinimumHeight(35)
         self.password_input.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(self.password_input)
         
         layout.addWidget(QLabel("Confirm Password: <span style='color: red;'>*</span>"))
-        self.confirm_password_input = QLineEdit()
-        self.confirm_password_input.setPlaceholderText("Re-enter password")
-        self.confirm_password_input.setEchoMode(QLineEdit.EchoMode.Password)
+        self.confirm_password_input = PasswordInput("Re-enter password")
         self.confirm_password_input.setMinimumHeight(35)
         self.confirm_password_input.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(self.confirm_password_input)
@@ -322,7 +371,7 @@ class LoginWindow(QMainWindow): #LOGIN WINDOW / FIRST THING YOU SEE IN THE APPLI
         layout.addWidget(title)
         layout.addSpacing(20)
         
-    def _add_input_fields(self, layout):
+    def _add_input_fields(self, layout): #SCHOOL ID AND PASSWORD INPUT FIELDS
         self.user_label = QLabel("School ID:")
         layout.addWidget(self.user_label)
         
@@ -335,9 +384,7 @@ class LoginWindow(QMainWindow): #LOGIN WINDOW / FIRST THING YOU SEE IN THE APPLI
         self.pass_label = QLabel("Password:")
         layout.addWidget(self.pass_label)
         
-        self.pass_input = QLineEdit()
-        self.pass_input.setPlaceholderText("Enter password...")
-        self.pass_input.setEchoMode(QLineEdit.EchoMode.Password)
+        self.pass_input = PasswordInput("Enter password...")
         self.pass_input.setMinimumHeight(35)
         self.pass_input.returnPressed.connect(self._on_login_clicked)
         self.pass_input.setStyleSheet(StyleSheet.get_input_style())
@@ -465,7 +512,7 @@ class ForgotPasswordDialog(QDialog):
         
         layout.addSpacing(15)
         
-    def _add_input_fields(self, layout):
+    def _add_input_fields(self, layout): #ALL INPUT FIELDS FOR PASSWORD RESET
         #SCHOOL ID FIELD
         layout.addWidget(QLabel("School ID:"))
         layout.addSpacing(2)
@@ -486,23 +533,19 @@ class ForgotPasswordDialog(QDialog):
         layout.addWidget(self.email_input)
         layout.addSpacing(5)
         
-        #NEW PASSWORD FIELD
+        #NEW PASSWORD FIELD WITH TOGGLE
         layout.addWidget(QLabel("New Password:"))
         layout.addSpacing(2)
-        self.new_password_input = QLineEdit()
-        self.new_password_input.setPlaceholderText("Enter new password")
-        self.new_password_input.setEchoMode(QLineEdit.EchoMode.Password)
+        self.new_password_input = PasswordInput("Enter new password")
         self.new_password_input.setMinimumHeight(40)
         self.new_password_input.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(self.new_password_input)
         layout.addSpacing(5)
         
-        #CONFIRM PASSWORD FIELD
+        #CONFIRM PASSWORD FIELD WITH TOGGLE
         layout.addWidget(QLabel("Confirm Password:"))
         layout.addSpacing(2)
-        self.confirm_password_input = QLineEdit()
-        self.confirm_password_input.setPlaceholderText("Re-enter new password")
-        self.confirm_password_input.setEchoMode(QLineEdit.EchoMode.Password)
+        self.confirm_password_input = PasswordInput("Re-enter new password")
         self.confirm_password_input.setMinimumHeight(40)
         self.confirm_password_input.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(self.confirm_password_input)
@@ -535,5 +578,3 @@ class ForgotPasswordDialog(QDialog):
             'new_password': self.new_password_input.text(),
             'confirm_password': self.confirm_password_input.text()
         }
-
-
