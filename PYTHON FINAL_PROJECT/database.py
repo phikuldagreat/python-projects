@@ -121,7 +121,7 @@ class Database:
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 student_id INT NOT NULL,
                 category VARCHAR(100) NOT NULL,
-                subject VARCHAR(255) NOT NULL,
+                complaint VARCHAR(255) NOT NULL,
                 location VARCHAR(255) NOT NULL,
                 description TEXT NOT NULL,
                 status ENUM('Pending', 'In Progress', 'Resolved') DEFAULT 'Pending',
@@ -359,13 +359,13 @@ class Database:
             
             query = '''
                 INSERT INTO complaints (
-                    student_id, category, subject, location, description, status
+                    student_id, category, complaint, location, description, status
                 ) VALUES (%s, %s, %s, %s, %s, 'Pending')
             '''
             values = (
                 student['id'],
                 complaint_data['category'],
-                complaint_data['subject'],
+                complaint_data['complaint'],
                 complaint_data['location'],
                 complaint_data['description']
             )
@@ -388,7 +388,7 @@ class Database:
         try:
             self._ensure_connection()
             query = '''
-                SELECT c.id, c.category, c.subject, c.location, c.status, 
+                SELECT c.id, c.category, c.complaint, c.location, c.status, 
                     DATE_FORMAT(c.created_at, '%Y-%m-%d') as date,
                     c.description
                 FROM complaints c
@@ -410,7 +410,7 @@ class Database:
         try:
             self._ensure_connection()
             query = '''
-                SELECT c.id, s.school_id, s.program, c.subject, 
+                SELECT c.id, s.school_id, s.program, c.complaint, 
                     c.status, DATE_FORMAT(c.created_at, '%Y-%m-%d') as date,
                     c.category, c.location, c.description
                 FROM complaints c
@@ -429,12 +429,12 @@ class Database:
             self._ensure_connection()
             query = '''
                 UPDATE complaints 
-                SET category = %s, subject = %s, location = %s, description = %s
+                SET category = %s, complaint = %s, location = %s, description = %s
                 WHERE id = %s AND status = 'Pending'
             '''
             values = (
                 complaint_data['category'],
-                complaint_data['subject'],
+                complaint_data['complaint'],
                 complaint_data['location'],
                 complaint_data['description'],
                 complaint_id

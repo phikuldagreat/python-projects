@@ -5,7 +5,7 @@
 
 from database import Database
 from config import DB_CONFIG
-
+import re
 
 class AuthValidator: #VALIDATOR FOR AUTH LOGIC
     
@@ -14,8 +14,8 @@ class AuthValidator: #VALIDATOR FOR AUTH LOGIC
         if not username or not password:
             return False, "Please enter both School ID and password."
         
-        if len(username) < 4:
-            return False, "School ID must be at least 4 characters."
+        if len(username) < 6:
+            return False, "School ID must be at least 6 characters."
             
         return True, None
     
@@ -36,11 +36,23 @@ class AuthValidator: #VALIDATOR FOR AUTH LOGIC
         if len(password) < 6:
             return False, "Password must be at least 6 characters long."
         
+        if not any(char.isdigit() for char in password):
+            return False, "Password must contain at least one number."
+        
+        if not any(char.isupper() for char in password):
+            return False, "Password must contain at least one uppercase letter."
+        
+        if not any(char.islower() for char in password):
+            return False, "Password must contain at least one lowercase letter."
+        
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+            return False, "Password must contain at least one special character."
+        
         if student_data['password'] != student_data.get('confirm_password'):
             return False, "Passwords do not match. Please try again."
         
         school_id = student_data['school_id']
-        if len(school_id) < 5:
+        if len(school_id) < 6:
             return False, "Please enter a valid School ID."
         
         contact = student_data['contact_number']

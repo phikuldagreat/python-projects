@@ -150,7 +150,7 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
         self.complaints_table = QTableWidget()
         self.complaints_table.setColumnCount(6)
         self.complaints_table.setHorizontalHeaderLabels([
-            "ID", "Student ID", "Program", "Subject", "Status", "Date"
+            "ID", "Student ID", "Program", "Complaint", "Status", "Date"
         ])
         
         header = self.complaints_table.horizontalHeader()
@@ -266,7 +266,7 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
                     c['id'],
                     c['school_id'],
                     c['program'],
-                    c['subject'],
+                    c['complaint'],
                     c['status'],
                     c['date']
                 ))
@@ -343,7 +343,7 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
                 Date Submitted: {complaint['date']}
                 Category: {complaint['category']}
                 Location: {complaint['location']}
-                Subject: {complaint['subject']}
+                Complaint: {complaint['complaint']}
                 Description: {complaint['description']}
                 """
         

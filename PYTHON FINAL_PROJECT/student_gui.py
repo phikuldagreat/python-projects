@@ -53,18 +53,18 @@ class SubmitComplaintDialog(QDialog): #DIALOG FOR SUBMITTING NEW COMPLAINT
         self.category_combo.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(self.category_combo)
         
-        #SUBJECT
-        layout.addWidget(QLabel("Subject: <span style='color: red;'>*</span>"))
-        self.subject_input = QLineEdit()
-        self.subject_input.setPlaceholderText("Brief description of the issue")
-        self.subject_input.setMinimumHeight(35)
-        self.subject_input.setStyleSheet(StyleSheet.get_input_style())
-        layout.addWidget(self.subject_input)
+        #COMPLAINT
+        layout.addWidget(QLabel("Complaint: <span style='color: red;'>*</span>"))
+        self.complaint_input = QLineEdit()
+        self.complaint_input.setPlaceholderText("Brief description of the issue")
+        self.complaint_input.setMinimumHeight(35)
+        self.complaint_input.setStyleSheet(StyleSheet.get_input_style())
+        layout.addWidget(self.complaint_input)
         
         #LOCATION
         layout.addWidget(QLabel("Location: <span style='color: red;'>*</span>"))
         self.location_input = QLineEdit()
-        self.location_input.setPlaceholderText("e.g., Lab 1, Room 301, Building A")
+        self.location_input.setPlaceholderText("e.g., CL4, PS 301, PS Building")
         self.location_input.setMinimumHeight(35)
         self.location_input.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(self.location_input)
@@ -87,8 +87,8 @@ class SubmitComplaintDialog(QDialog): #DIALOG FOR SUBMITTING NEW COMPLAINT
         layout.addWidget(button_box)
         
     def validate_and_accept(self): #INPUT VALIDATOR
-        if not self.subject_input.text().strip():
-            QMessageBox.warning(self, "Validation Error", "Please enter a subject.")
+        if not self.complaint_input.text().strip():
+            QMessageBox.warning(self, "Validation Error", "Please enter a complaint.")
             return
         
         if not self.location_input.text().strip():
@@ -104,7 +104,7 @@ class SubmitComplaintDialog(QDialog): #DIALOG FOR SUBMITTING NEW COMPLAINT
     def get_complaint_data(self): #GET COMPLAINT DATA FROM INPUT FIELDS
         return {
             'category': self.category_combo.currentText(),
-            'subject': self.subject_input.text().strip(),
+            'complaint': self.complaint_input.text().strip(),
             'location': self.location_input.text().strip(),
             'description': self.description_input.toPlainText().strip()
         }
@@ -142,18 +142,18 @@ class EditComplaintDialog(QDialog): #CLASS FOR EDITING COMPLAINTS
         self.category_combo.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(self.category_combo)
         
-        #SUBJECT
-        layout.addWidget(QLabel("Subject: <span style='color: red;'>*</span>"))
-        self.subject_input = QLineEdit()
-        self.subject_input.setPlaceholderText("Brief description of the issue")
-        self.subject_input.setMinimumHeight(35)
-        self.subject_input.setStyleSheet(StyleSheet.get_input_style())
-        layout.addWidget(self.subject_input)
+        #COMPLAINT
+        layout.addWidget(QLabel("Complaint: <span style='color: red;'>*</span>"))
+        self.complaint_input = QLineEdit()
+        self.complaint_input.setPlaceholderText("Brief description of the issue")
+        self.complaint_input.setMinimumHeight(35)
+        self.complaint_input.setStyleSheet(StyleSheet.get_input_style())
+        layout.addWidget(self.complaint_input)
         
         #LOCATION
         layout.addWidget(QLabel("Location: <span style='color: red;'>*</span>"))
         self.location_input = QLineEdit()
-        self.location_input.setPlaceholderText("e.g., Lab 1, Room 301, Building A")
+        self.location_input.setPlaceholderText("e.g., CL4, Room 301, PS Building")
         self.location_input.setMinimumHeight(35)
         self.location_input.setStyleSheet(StyleSheet.get_input_style())
         layout.addWidget(self.location_input)
@@ -177,13 +177,13 @@ class EditComplaintDialog(QDialog): #CLASS FOR EDITING COMPLAINTS
         
     def _populate_data(self): #POPULATE FIELDS WITH EXISTING COMPLAINT DATA
         self.category_combo.setCurrentText(self.complaint_data.get('category', ''))
-        self.subject_input.setText(self.complaint_data.get('subject', ''))
+        self.complaint_input.setText(self.complaint_data.get('complaint', ''))
         self.location_input.setText(self.complaint_data.get('location', ''))
         self.description_input.setPlainText(self.complaint_data.get('description', ''))
         
     def validate_and_accept(self): #CHECKS IF FIELDS ARE BLANK
-        if not self.subject_input.text().strip():
-            QMessageBox.warning(self, "Validation Error", "Please enter a subject.")
+        if not self.complaint_input.text().strip():
+            QMessageBox.warning(self, "Validation Error", "Please enter a complaint.")
             return
         
         if not self.location_input.text().strip():
@@ -199,7 +199,7 @@ class EditComplaintDialog(QDialog): #CLASS FOR EDITING COMPLAINTS
     def get_complaint_data(self): #GET UPDATED COMPLAINT DATA FROM INPUT FIELDS
         return {
             'category': self.category_combo.currentText(),
-            'subject': self.subject_input.text().strip(),
+            'complaint': self.complaint_input.text().strip(),
             'location': self.location_input.text().strip(),
             'description': self.description_input.toPlainText().strip()
         }
@@ -317,7 +317,7 @@ class StudentDashboard(QMainWindow): #STUDENT'S DASHBOARD
         self.complaints_table = QTableWidget()
         self.complaints_table.setColumnCount(6)
         self.complaints_table.setHorizontalHeaderLabels([
-            "ID", "Category", "Subject", "Location", "Status", "Date"
+            "ID", "Category", "Complaint", "Location", "Status", "Date"
         ])
         
         #COLUMN WIDTHS
@@ -454,16 +454,7 @@ class StudentDashboard(QMainWindow): #STUDENT'S DASHBOARD
             )
             return
         
-        #GET CURRENT COMPLAINT DATA
-        row = self.complaints_table.currentRow()
-        complaint_data = {
-            'category': self.complaints_table.item(row, 1).text(),
-            'subject': self.complaints_table.item(row, 2).text(),
-            'location': self.complaints_table.item(row, 3).text(),
-            'description': self.details_text.toPlainText()
-        }
-        
-        dialog = EditComplaintDialog(complaint_data, self)
+        dialog = EditComplaintDialog(self.selected_complaint_data, self)
         
         if dialog.exec() == QDialog.DialogCode.Accepted:
             updated_data = dialog.get_complaint_data()
@@ -532,6 +523,8 @@ class StudentDashboard(QMainWindow): #STUDENT'S DASHBOARD
         if not self.current_user:
             return
         
+        current_selection = self.selected_complaint_id
+
         #GET COMPLAINTS FROM DATABASE
         complaints = self.db.get_student_complaints(self.current_user['school_id'])
         
@@ -539,7 +532,7 @@ class StudentDashboard(QMainWindow): #STUDENT'S DASHBOARD
             (
                 complaint['id'],
                 complaint['category'],
-                complaint['subject'],
+                complaint['complaint'],
                 complaint['location'],
                 complaint['status'],
                 complaint['date'],
@@ -549,6 +542,20 @@ class StudentDashboard(QMainWindow): #STUDENT'S DASHBOARD
         ]
         
         self.display_complaints(formatted_complaints)
+
+        if current_selection:
+            for row in range(self.complaints_table.rowCount()):
+                if int(self.complaints_table.item(row, 0).text()) == current_selection:
+                    self.complaints_table.selectRow(row)
+
+                    self.on_complaint_selected()
+                    break
+            else:
+                self.selected_complaint_id = None
+                self.selected_complaint_status = None
+                self.details_text.clear()
+                self.edit_btn.setEnabled(False)
+                self.delete_btn.setEnabled(False)
         
     def display_complaints(self, complaints): #DISPLAY COMPLAINTS IN TABLE
         self.complaints_table.setRowCount(len(complaints))
@@ -582,10 +589,16 @@ class StudentDashboard(QMainWindow): #STUDENT'S DASHBOARD
         
         self.selected_complaint_id = complaint[0]
         self.selected_complaint_status = complaint[4]
+        self.selected_complaint_data = {
+        'category': complaint[1],
+        'complaint': complaint[2],
+        'location': complaint[3],
+        'description': complaint[6]
+        }
         
         #DISPLAY DETAILS
         details = f"""Category: {complaint[1]}
-                    Subject: {complaint[2]}
+                    complaint: {complaint[2]}
                     Location: {complaint[3]}
                     Status: {complaint[4]}
                     Date Submitted: {complaint[5]}
