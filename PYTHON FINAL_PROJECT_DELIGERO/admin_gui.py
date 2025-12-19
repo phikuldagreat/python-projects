@@ -91,6 +91,7 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
     def _add_program_filter(self, layout): #PROGRAM FILTER DROPDOWN
         filter_program_label = QLabel("Filter by Program:")
         filter_program_label.setFont(QFont("Arial", 12))
+        filter_program_label.setMinimumWidth(150)
         layout.addWidget(filter_program_label)
         
         self.program_filter = QComboBox()
@@ -105,7 +106,8 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
             "Bachelor of Multimedia Arts"
         ])
         self.program_filter.currentTextChanged.connect(self.filter_complaints)
-        self.program_filter.setMinimumWidth(400)
+        self.program_filter.setMinimumWidth(500)
+        self.program_filter.setMaximumWidth(530)
         self.program_filter.setMinimumHeight(40)
         self.program_filter.setFont(QFont("Arial", 11))
         self.program_filter.setStyleSheet(StyleSheet.get_input_style())
@@ -124,7 +126,7 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
             "Resolved"
         ])
         self.status_filter.currentTextChanged.connect(self.filter_complaints)
-        self.status_filter.setMinimumWidth(200)
+        self.program_filter.setMinimumWidth(180)
         self.status_filter.setMinimumHeight(40)
         self.status_filter.setFont(QFont("Arial", 11))
         self.status_filter.setStyleSheet(StyleSheet.get_input_style())
