@@ -140,12 +140,6 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
         layout.addWidget(refresh_btn)
         
     def _add_complaints_table(self, layout): #COMPLAINTS TABLE
-        table_label = QLabel("Complaints List")
-        label_font = QFont()
-        label_font.setPointSize(12)
-        label_font.setBold(True)
-        table_label.setFont(label_font)
-        layout.addWidget(table_label)
         
         self.complaints_table = QTableWidget()
         self.complaints_table.setColumnCount(6)
@@ -154,12 +148,7 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
         ])
         
         header = self.complaints_table.horizontalHeader()
-        header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
-        header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
-        header.setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
-        header.setSectionResizeMode(3, QHeaderView.ResizeMode.Stretch)
-        header.setSectionResizeMode(4, QHeaderView.ResizeMode.ResizeToContents)
-        header.setSectionResizeMode(5, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         
         self.complaints_table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.complaints_table.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
@@ -179,7 +168,7 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
         
         details_frame = QFrame()
         details_frame.setFrameStyle(QFrame.Shape.StyledPanel)
-        details_frame.setMaximumHeight(150)
+        details_frame.setMaximumHeight(180)
         details_frame.setStyleSheet(f"""
             QFrame {{
                 background-color: {ColorTheme.BG_CARD};
@@ -194,7 +183,7 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
         self.details_text = QTextEdit()
         self.details_text.setReadOnly(True)
         self.details_text.setPlaceholderText("Select a complaint to view details...")
-        self.details_text.setMaximumHeight(120)
+        self.details_text.setMaximumHeight(150)
         self.details_text.setStyleSheet(f"""
             QTextEdit {{
                 background-color: {ColorTheme.WHITE};
@@ -213,7 +202,7 @@ class AdminDashboard(QMainWindow): #ADMIN DASHBOARD TO MANAGE AND VIEW COMPLAINT
         
         left_buttons_layout = QHBoxLayout()
         
-        self.in_progress_btn = QPushButton("Mark as In Progress")
+        self.in_progress_btn = QPushButton("Mark In Progress")
         self.in_progress_btn.setEnabled(False)
         self.in_progress_btn.setMinimumWidth(180)
         self.in_progress_btn.setMinimumHeight(45)

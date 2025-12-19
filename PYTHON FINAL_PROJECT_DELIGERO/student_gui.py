@@ -307,12 +307,6 @@ class StudentDashboard(QMainWindow): #STUDENT'S DASHBOARD
         layout.addLayout(button_layout)
         
     def _add_complaints_table(self, layout): #ADD COMPLAINTS TABLE
-        table_label = QLabel("My Submitted Complaints")
-        label_font = QFont()
-        label_font.setPointSize(12)
-        label_font.setBold(True)
-        table_label.setFont(label_font)
-        layout.addWidget(table_label)
         
         self.complaints_table = QTableWidget()
         self.complaints_table.setColumnCount(6)
@@ -322,12 +316,7 @@ class StudentDashboard(QMainWindow): #STUDENT'S DASHBOARD
         
         #COLUMN WIDTHS
         header = self.complaints_table.horizontalHeader()
-        header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
-        header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
-        header.setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
-        header.setSectionResizeMode(3, QHeaderView.ResizeMode.ResizeToContents)
-        header.setSectionResizeMode(4, QHeaderView.ResizeMode.ResizeToContents)
-        header.setSectionResizeMode(5, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         
         self.complaints_table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.complaints_table.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
@@ -337,7 +326,7 @@ class StudentDashboard(QMainWindow): #STUDENT'S DASHBOARD
         
         layout.addWidget(self.complaints_table)
         
-    def _add_details_panel(self, layout): #ADD COMPLAINT DETAILS PANEL (without buttons)
+    def _add_details_panel(self, layout): #ADD COMPLAINT DETAILS PANEL 
         details_label = QLabel("Complaint Details")
         label_font = QFont()
         label_font.setPointSize(12)
@@ -348,7 +337,7 @@ class StudentDashboard(QMainWindow): #STUDENT'S DASHBOARD
         details_frame = QFrame()
         details_frame.setFrameStyle(QFrame.Shape.StyledPanel)
         details_frame.setStyleSheet("QFrame { background-color: #f9f9f9; border-radius: 5px; }")
-        details_frame.setMaximumHeight(150)
+        details_frame.setMaximumHeight(180)
         
         details_layout = QVBoxLayout(details_frame)
         details_layout.setContentsMargins(15, 15, 15, 15)
@@ -357,7 +346,7 @@ class StudentDashboard(QMainWindow): #STUDENT'S DASHBOARD
         self.details_text = QTextEdit()
         self.details_text.setReadOnly(True)
         self.details_text.setPlaceholderText("Select a complaint to view details...")
-        self.details_text.setMaximumHeight(120)  # Constrain height
+        self.details_text.setMaximumHeight(150)
         details_layout.addWidget(self.details_text)
         
         layout.addWidget(details_frame)
@@ -377,33 +366,33 @@ class StudentDashboard(QMainWindow): #STUDENT'S DASHBOARD
     def _add_edit_delete_buttons(self, layout): #ADD EDIT AND DELETE BUTTONS
         left_buttons_layout = QHBoxLayout()
         
-        self.edit_btn = QPushButton("Edit")  # CREATE FIRST
+        self.edit_btn = QPushButton("Edit")
         self.edit_btn.setEnabled(False)
         self.edit_btn.setMinimumWidth(180)
         self.edit_btn.setMinimumHeight(45)
         self.edit_btn.setFont(QFont("Arial", 11))
         self.edit_btn.clicked.connect(self.edit_complaint)
-        self.edit_btn.setStyleSheet(StyleSheet.get_button_style("primary"))  # THEN STYLE
+        self.edit_btn.setStyleSheet(StyleSheet.get_button_style("primary"))
         left_buttons_layout.addWidget(self.edit_btn)
         
-        self.delete_btn = QPushButton("Delete")  # CREATE FIRST
+        self.delete_btn = QPushButton("Delete")
         self.delete_btn.setEnabled(False)
         self.delete_btn.setMinimumWidth(180)
         self.delete_btn.setMinimumHeight(45)
         self.delete_btn.setFont(QFont("Arial", 11))
         self.delete_btn.clicked.connect(self.delete_complaint)
-        self.delete_btn.setStyleSheet(StyleSheet.get_button_style("danger"))  # THEN STYLE
+        self.delete_btn.setStyleSheet(StyleSheet.get_button_style("danger"))
         left_buttons_layout.addWidget(self.delete_btn)
         
         layout.addLayout(left_buttons_layout)
 
     def _add_logout_button(self, layout): #ADD LOGOUT BUTTON
-        logout_btn = QPushButton("Logout")  # CREATE FIRST
+        logout_btn = QPushButton("Logout")
         logout_btn.setMinimumWidth(150)
         logout_btn.setMinimumHeight(45)
         logout_btn.setFont(QFont("Arial", 11))
         logout_btn.clicked.connect(self.logout_requested.emit)
-        logout_btn.setStyleSheet(StyleSheet.get_button_style("danger"))  # THEN STYLE
+        logout_btn.setStyleSheet(StyleSheet.get_button_style("danger"))
         layout.addWidget(logout_btn)
         
     def set_user(self, user_data): #SET CURRENT USER INFORMATION
@@ -566,7 +555,7 @@ class StudentDashboard(QMainWindow): #STUDENT'S DASHBOARD
                 item = QTableWidgetItem(str(complaint[col]))
                 
                 #COLOR CODE
-                if col == 4:  # Status column
+                if col == 4:  #Status column
                     if complaint[col] == "Pending":
                         item.setForeground(QColor(ColorTheme.STATUS_PENDING))
                     elif complaint[col] == "In Progress":
